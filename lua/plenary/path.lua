@@ -835,7 +835,7 @@ end
 function Path:iter()
   local data = self:readlines()
   local i = 0
-  local n = table.getn(data)
+  local n = #data
   return function()
     i = i + 1
     if i <= n then
@@ -859,9 +859,14 @@ function Path:readbyterange(offset, length)
 
   if offset < 0 then
     offset = stat.size + offset
+    -- Windows fails if offset is < 0 even though offset is defined as signed
+    -- http://docs.libuv.org/en/v1.x/fs.html#c.uv_fs_read
+    if offset < 0 then
+      offset = 0
+    end
   end
 
-  data = ""
+  local data = ""
   while #data < length do
     local read_chunk = assert(uv.fs_read(fd, length - #data, offset))
     if #read_chunk == 0 then
