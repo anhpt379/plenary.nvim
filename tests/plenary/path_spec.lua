@@ -168,6 +168,12 @@ describe("Path", function()
   end)
 
   describe(":normalize", function()
+    it("can take path that has one character directories", function()
+      local orig = "/home/j/./p//path.lua"
+      local final = Path:new(orig):normalize()
+      assert.are.same(final, "/home/j/p/path.lua")
+    end)
+
     it("can take paths with double separators change them to single separators", function()
       local orig = "/lua//plenary/path.lua"
       local final = Path:new(orig):normalize()
@@ -211,7 +217,7 @@ describe("Path", function()
       local p = Path:new { home, "./test_file" }
       p.path.home = home
       p._cwd = "/tmp/lua"
-      assert.are.same("~/./test_file", p:normalize())
+      assert.are.same("~/test_file", p:normalize())
     end)
 
     it("can normalize ~ when file is within home directory (no trailing slash)", function()
@@ -219,7 +225,7 @@ describe("Path", function()
       local p = Path:new { home, "./test_file" }
       p.path.home = home
       p._cwd = "/tmp/lua"
-      assert.are.same("~//./test_file", p:normalize())
+      assert.are.same("~/test_file", p:normalize())
     end)
   end)
 
